@@ -1,0 +1,36 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "zsh",
+		"[python]": {
+			"editor.tabSize": 4,
+			"editor.formatOnSave": true,
+		},
+		"autopep8.args": [
+			"--max-line-length=240",
+		],
+		"python.analysis.extraPaths": [
+		],
+		"pylint.args": [
+			"--disable=C0301,C0114,C0103,W0719,W0718,E0402,E0611,C0116,C0115",
+			// "--disable=C0301,C0114,C0103,W0719,W0718",
+			"--max-line-length=240"
+		],
+		"search.exclude": {
+			"**/*.egg-info/**": true,
+			"**/*.pytest_cache/**": true,
+			"**/.venv/**": true,
+			"**/__pycache__/**": true
+		},
+		"files.exclude": {
+			"**/*.egg-info/**": true,
+			"**/*.pytest_cache/**": true,
+			// "**/.venv/**": true,
+			"**/__pycache__/**": true
+		},
+	}
+}
