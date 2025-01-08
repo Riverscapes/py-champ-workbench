@@ -12,6 +12,13 @@
             "console": "integratedTerminal",
         },
         {
+            "name": "Load Asotin Data",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/import_asotin_projects.py",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
