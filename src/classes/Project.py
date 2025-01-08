@@ -17,6 +17,7 @@ class Project():
         self.project_type = project_type
         self.status_id = status_id
         self.status = status
+        self.description = None
 
     @staticmethod
     def load(watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str) -> list:
@@ -59,3 +60,38 @@ class Project():
             status_id=row['status_id'],
             status=row['status'],
         ) for row in rows]
+
+    @staticmethod
+    def save(project_id: int, status_id: int, guid: str, description: str) -> None:
+
+        if guid == '':
+            guid = None
+
+        if description == '':
+            description = None
+
+        conn = db_connect()
+        curs = conn.cursor()
+        curs.execute('UPDATE projects SET status_id = %s, guid = %s, description = %s WHERE project_id = %s', (status_id, guid, description, project_id))
+        conn.commit()
+
+    @staticmethod
+    def load_project_by_id(project_id: int) -> 'Project':
+        conn = db_connect()
+        curs = conn.cursor()
+        curs.execute('SELECT * FROM vw_projects WHERE project_id = %s', (project_id,))
+        row = curs.fetchone()
+        return Project(
+            watershed_id=row['watershed_id'],
+            watershed_name=row['watershed_name'],
+            site_id=row['site_id'],
+            site_name=row['site_name'],
+            visit_id=row['visit_id'],
+            visit_year=row['visit_year'],
+            guid=row['guid'],
+            project_id=row['project_id'],
+            project_type_id=row['project_type_id'],
+            project_type=row['project_type'],
+            status_id=row['status_id'],
+            status=row['status'],
+        )
