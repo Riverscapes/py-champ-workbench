@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from datetime import datetime, timedelta
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QApplication, QPushButton, QLineEdit, QSplitter
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QApplication, QPushButton, QLineEdit, QSplitter, QLabel
 from PyQt6.QtCore import Qt, QPoint, pyqtSignal
 from classes.DBCon import db_connect
 from models.ProjectsModel import ProjectsModel
@@ -61,6 +61,9 @@ class ProjectsView(QWidget):
         self.project_types.on_check_changed.connect(self.on_filters_changed)
         left_layout.addWidget(self.project_types)
 
+        self.lbl_status = QLabel('')
+        left_layout.addWidget(self.lbl_status)
+
         ########################################################################################################################
         # Right table layout
 
@@ -93,6 +96,7 @@ class ProjectsView(QWidget):
         project_type_ids = [id for id, name in self.project_types.get_checked_items()]
         search = self.search.text()
 
-        self.model.load_data(watershed_ids, visit_years, statuses, project_type_ids, search)
+        total = self.model.load_data(watershed_ids, visit_years, statuses, project_type_ids, search)
+        self.lbl_status.setText(f"Project: {total:,}")
         self.on_data_changed.emit()
         self.table.resizeColumnsToContents()

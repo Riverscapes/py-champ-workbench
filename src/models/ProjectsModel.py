@@ -37,11 +37,12 @@ class ProjectsModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             return self._header[section]
 
-    def load_data(self, watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str,):
+    def load_data(self, watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str,) -> int:
 
         self.beginResetModel()
         self._data = Project.load(watershed_ids, visit_years, statuses, project_type_ids, search)
         self.endResetModel()
+        return len(self._data)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)

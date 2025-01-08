@@ -1,6 +1,7 @@
 from typing import List, Tuple
-from PyQt6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout, QWidget
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout, QWidget, QMenu
+from PyQt6.QtCore import Qt, pyqtSignal, QPoint
+from PyQt6.QtGui import QAction
 
 
 class CheckedListBox(QWidget):
@@ -33,19 +34,12 @@ class CheckedListBox(QWidget):
         layout.addWidget(self.list_widget)
         self.setLayout(layout)
 
-    def select_all(self):
+    def select_all(self, checked: bool):
         """Select all items in the list."""
 
         for i in range(self.list_widget.count()):
             item = self.list_widget.item(i)
-            item.setCheckState(Qt.CheckState.Checked)
-
-    def select_none(self):
-        """Deselect all items in the list."""
-
-        for i in range(self.list_widget.count()):
-            item = self.list_widget.item(i)
-            item.setCheckState(Qt.CheckState.Unchecked)
+            item.setCheckState(Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked)
 
     def get_checked_items(self) -> List[Tuple[int, str]]:
         """Return a list of checked items."""
@@ -62,3 +56,47 @@ class CheckedListBox(QWidget):
 
         # print(f"{item.text()} is checked" if item.checkState() == Qt.CheckState.Checked else f"{item.text()} is unchecked")
         self.on_check_changed.emit()
+
+    # def show_context_menu(self, position: QPoint):
+    #     # Get the index of the item that was clicked
+    #     index = self.table.indexAt(position)
+
+    #     if not index.isValid():
+    #         return
+
+    #     # Get the row number
+    #     row = index.row()
+
+    #     # Assuming the first column has the TransactionID, adjust column index if needed
+    #     transaction_id = self.model.data(self.model.index(row, 0))  # TransactionID assumed in column 0
+
+    #     # Create the context menu
+    #     context_menu = QMenu(self)
+
+    #     # Add actions to the context menu
+    #     select_all_action = QAction('Select All', self)
+    #     selection_none_action = QAction('Select None', self)
+
+    #     # Add actions to the menu
+    #     context_menu.addAction(select_all_action)
+    #     context_menu.addAction(selection_none_action)
+
+    #     # Connect the actions to slots (you can define what should happen)
+    #     select_all_action.triggered.connect(lambda: self.select_all(True))
+    #     selection_none_action.triggered.connect(lambda: self.select_all(False))
+
+    #     # Show the context menu at the cursor position
+    #     context_menu.exec(self.table.viewport().mapToGlobal(position))
+
+    def contextMenuEvent(self, event):
+        context_menu = QMenu(self)
+
+        select_all_action = QAction("Select All", self)
+        select_all_action.triggered.connect(lambda: self.select_all(True))
+        context_menu.addAction(select_all_action)
+
+        select_none_action = QAction("Select None", self)
+        select_none_action.triggered.connect(lambda: self.select_all(False))
+        context_menu.addAction(select_none_action)
+
+        context_menu.exec(self.mapToGlobal(event.pos()))
