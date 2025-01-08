@@ -1,3 +1,4 @@
+import webbrowser
 from typing import List, Tuple
 from datetime import datetime, timedelta
 from PyQt6.QtGui import QAction
@@ -115,9 +116,17 @@ class ProjectsView(QWidget):
 
     def handle_double_click(self, index):
         row = index.row()
+        col = index.column()
         item_id = self.model.data(self.model.index(row, 0))
-        dialog = ProjectDialog(item_id)
-        result = dialog.exec()
-        if result == QDialog.DialogCode.Accepted:
-            self.load_data(item_id)
-            self.on_data_changed.emit()
+
+        if col == 6:
+            guid = self.model.data(self.model.index(row, 6))
+            if guid is not None and guid != '':
+                url = f'https://data.riverscapes.net/p/{guid}'
+                webbrowser.open(url)
+        else:
+            dialog = ProjectDialog(item_id)
+            result = dialog.exec()
+            if result == QDialog.DialogCode.Accepted:
+                self.load_data(item_id)
+                self.on_data_changed.emit()

@@ -4,7 +4,8 @@ from classes.DBCon import db_connect
 
 class Project():
 
-    def __init__(self, watershed_id: int, watershed_name: str, site_id: int, site_name: str, visit_id: int, visit_year: int, guid: str, project_id: int, project_type_id: int, project_type: str, status_id: int, status: str):
+    def __init__(self, watershed_id: int, watershed_name: str, site_id: int, site_name: str, visit_id: int,
+                 visit_year: int, guid: str, project_id: int, project_type_id: int, project_type: str, status_id: int, status: str, description: str):
         self.watershed_id = watershed_id
         self.watershed_name = watershed_name
         self.site_id = site_id
@@ -17,7 +18,7 @@ class Project():
         self.project_type = project_type
         self.status_id = status_id
         self.status = status
-        self.description = None
+        self.description = description
 
     @staticmethod
     def load(watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str) -> list:
@@ -40,6 +41,7 @@ class Project():
                 AND (%s = 0 OR status_id = ANY(%s))
                 AND (%s = 0 OR project_type_id = ANY(%s))
                 {search_filter}
+            ORDER BY watershed_name, site_name, visit_year, project_type
         '''
 
         conn = db_connect()
@@ -59,6 +61,7 @@ class Project():
             project_type=row['project_type'],
             status_id=row['status_id'],
             status=row['status'],
+            description=row['description']
         ) for row in rows]
 
     @staticmethod
@@ -94,4 +97,5 @@ class Project():
             project_type=row['project_type'],
             status_id=row['status_id'],
             status=row['status'],
+            description=row['description']
         )
