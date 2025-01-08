@@ -20,9 +20,13 @@ class Project():
 
     @staticmethod
     def load(watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str) -> list:
-        params = [watershed_ids, visit_years, statuses, project_type_ids]
-        search_filter = ''
+        params = [watershed_ids, visit_years, statuses, project_type_ids, project_type_ids]
+        params = [len(watershed_ids), watershed_ids,
+                  len(visit_years), visit_years,
+                  len(statuses), statuses,
+                  len(project_type_ids),  project_type_ids]
 
+        search_filter = ''
         if search != '':
             search_filter = ' AND (%s IS NULL OR LOWER(site_name) LIKE LOWER(%s) OR visit_id::text = %s)'
             params.extend([None, f'%{search}%', search])
@@ -30,10 +34,10 @@ class Project():
         query = f'''
             SELECT *
             FROM vw_projects
-            WHERE (watershed_id = ANY(%s))
-                AND (visit_year = ANY(%s))
-                AND (status_id = ANY(%s))
-                AND (project_type_id = ANY(%s))
+            WHERE (%s = 0 OR watershed_id = ANY(%s))
+                AND (%s = 0 OR visit_year = ANY(%s))
+                AND (%s = 0 OR status_id = ANY(%s))
+                AND (%s = 0 OR project_type_id = ANY(%s))
                 {search_filter}
         '''
 

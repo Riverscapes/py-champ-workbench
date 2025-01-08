@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from datetime import datetime, timedelta
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QApplication, QPushButton, QLineEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QApplication, QPushButton, QLineEdit, QSplitter
 from PyQt6.QtCore import Qt, QPoint, pyqtSignal
 from classes.DBCon import db_connect
 from models.ProjectsModel import ProjectsModel
@@ -26,8 +26,13 @@ class ProjectsView(QWidget):
         main_hlayout = QHBoxLayout()
         menu_bar = QMenuBar(self)
 
-        left_layout = QVBoxLayout()
-        main_hlayout.addLayout(left_layout)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        main_hlayout.addWidget(splitter)
+
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
+        splitter.addWidget(left_widget)
+        splitter.setStretchFactor(0, 0)  # Fixed width for the left pane
 
         self.search = QLineEdit()
         self.search.setFixedWidth(200)
@@ -72,10 +77,12 @@ class ProjectsView(QWidget):
         self.table.setAlternatingRowColors(True)
         self.table.setColumnHidden(0, True)
 
+        splitter.addWidget(self.table)
+        splitter.setStretchFactor(1, 1)  # Stretch for the right pane
+
         # Force load of initial data
         self.on_filters_changed()
 
-        main_hlayout.addWidget(self.table)
         self.setLayout(main_hlayout)
 
     def on_filters_changed(self):
