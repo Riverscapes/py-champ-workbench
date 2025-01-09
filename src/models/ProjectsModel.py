@@ -1,5 +1,4 @@
-from typing import List, Tuple
-from datetime import datetime
+from typing import List
 from PyQt6.QtCore import Qt, QAbstractTableModel, QModelIndex
 from PyQt6.QtGui import QColor
 from classes.Project import Project

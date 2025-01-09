@@ -1,11 +1,7 @@
 import os
 import sys
-import re
-import json
-from datetime import datetime
-from pathlib import Path
 from dotenv import load_dotenv
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QFileDialog, QMessageBox, QDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QMessageBox, QDialog
 from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QSettings, Qt
 from views.ProjectsView import ProjectsView

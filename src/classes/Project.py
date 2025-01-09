@@ -1,5 +1,4 @@
 from typing import List
-from classes.DBCon import db_connect
 from classes.DBConProps import DBConProps
 
 
@@ -66,7 +65,7 @@ class Project():
         ) for row in rows]
 
     @staticmethod
-    def save(project_id: int, status_id: int, guid: str, description: str) -> None:
+    def save(db_con_props: DBConProps, project_id: int, status_id: int, guid: str, description: str) -> None:
 
         if guid == '':
             guid = None
@@ -74,14 +73,14 @@ class Project():
         if description == '':
             description = None
 
-        conn = db_connect()
+        conn = db_con_props.connect()
         curs = conn.cursor()
         curs.execute('UPDATE projects SET status_id = %s, guid = %s, description = %s WHERE project_id = %s', (status_id, guid, description, project_id))
         conn.commit()
 
     @staticmethod
-    def load_project_by_id(project_id: int) -> 'Project':
-        conn = db_connect()
+    def load_project_by_id(db_con_props: DBConProps, project_id: int) -> 'Project':
+        conn = db_con_props.connect()
         curs = conn.cursor()
         curs.execute('SELECT * FROM vw_projects WHERE project_id = %s', (project_id,))
         row = curs.fetchone()

@@ -1,8 +1,5 @@
 import webbrowser
-from typing import List, Tuple
-from datetime import datetime, timedelta
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QApplication, QPushButton, QLineEdit, QSplitter, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QLineEdit, QSplitter, QLabel
 from PyQt6.QtCore import Qt, QPoint, pyqtSignal
 from models.ProjectsModel import ProjectsModel
 from widgets.CheckedListBox import CheckedListBox
