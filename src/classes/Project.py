@@ -1,5 +1,6 @@
 from typing import List
 from classes.DBCon import db_connect
+from classes.DBConProps import DBConProps
 
 
 class Project():
@@ -21,7 +22,7 @@ class Project():
         self.description = description
 
     @staticmethod
-    def load(watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str) -> list:
+    def load(db_con_props: DBConProps, watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str) -> list:
         params = [watershed_ids, visit_years, statuses, project_type_ids, project_type_ids]
         params = [len(watershed_ids), watershed_ids,
                   len(visit_years), visit_years,
@@ -44,7 +45,7 @@ class Project():
             ORDER BY watershed_name, site_name, visit_year, project_type
         '''
 
-        conn = db_connect()
+        conn = db_con_props.connect()
         curs = conn.cursor()
         curs.execute(query, params)
         rows = curs.fetchall()

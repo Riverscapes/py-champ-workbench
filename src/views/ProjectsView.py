@@ -9,6 +9,7 @@ from widgets.CheckedListBox import CheckedListBox
 from classes.Watershed import Watershed
 from classes.ProjectType import ProjectType
 from classes.Status import Status
+from classes.DBConProps import DBConProps
 from dialogs.ProjectDialog import ProjectDialog
 
 
@@ -16,13 +17,8 @@ class ProjectsView(QWidget):
 
     on_data_changed = pyqtSignal()
 
-    def __init__(self, db_path: str):
+    def __init__(self, db_con_props: DBConProps):
         super().__init__()
-
-        # conn = db_connect()
-        # # curs = conn.cursor()
-        # # curs.execute("SELECT * FROM visits")
-        # # self.visits = curs.fetchall()
 
         main_hlayout = QHBoxLayout()
         menu_bar = QMenuBar(self)
@@ -75,7 +71,7 @@ class ProjectsView(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.doubleClicked.connect(self.handle_double_click)
 
-        self.model = ProjectsModel()
+        self.model = ProjectsModel(db_con_props)
         # self.account.currentIndexChanged.connect(self.on_filters_changed)
         self.table.setModel(self.model)
         self.table.setAlternatingRowColors(True)

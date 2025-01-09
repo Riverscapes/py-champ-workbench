@@ -7,8 +7,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QFileDialog, QMessageBox, QDialog
 from PyQt6.QtGui import QAction
-from PyQt6.QtCore import QSettings, QEvent, Qt
+from PyQt6.QtCore import QSettings, Qt
 from views.ProjectsView import ProjectsView
+from dialogs.LoginDialog import LoginDialog
+from classes.DBConProps import DBConProps
 
 COMPANY_NAME = 'NorthArrowResearch'
 APP_NAME = 'ChAMPWorkbench'
@@ -19,11 +21,10 @@ load_dotenv()
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, access_token=None, account_id=None):
+    def __init__(self):
         super().__init__()
 
-        self.access_token = access_token
-        self.account_id = account_id
+        self.db_con_props = None
 
         self.mdi_area = QMdiArea()
         self.setCentralWidget(self.mdi_area)
@@ -33,6 +34,10 @@ class MainWindow(QMainWindow):
         menu_bar = self.menuBar()
 
         self.file_menu = menu_bar.addMenu('File')
+        action = QAction('Login', self)
+        # action.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
+        action.triggered.connect(self.login)
+        self.file_menu.addAction(action)
 
         # Items that don't vary by database simply have 'None' as their data
         self.views_menu = menu_bar.addMenu('Views')
@@ -53,15 +58,53 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('CHaMP Workbench')
         self.resize(800, 1000)
 
-        self.db_path = None
-        settings = QSettings(COMPANY_NAME, APP_NAME)
-        # db_path = settings.value(LAST_DATABASE, type=str)
-        # if db_path is not None and os.path.isfile(db_path):
-        #     self.open_db(db_path)
-
         self.open_visits()
 
         self.show()
+
+    def login(self):
+
+        if load_dotenv() is True:
+            self.db_con_props = DBConProps(
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                db=os.getenv("DB_NAME"),
+                root_cert=os.getenv("SSLROOTCERT"),
+                client_cert=os.getenv("SSLCLIENTCERT"),
+                ssl_key=os.getenv("SSLKEY")
+            )
+        else:
+            settings = QSettings(COMPANY_NAME, APP_NAME)
+            dialog = LoginDialog(settings, self)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                try:
+                    con_props = DBConProps(
+                        host=dialog.host.text(),
+                        port=int(dialog.port.text()),
+                        user=dialog.user.text(),
+                        password=dialog.password.text(),
+                        db=dialog.database.text(),
+                        root_cert=dialog.root_cert.text(),
+                        client_cert=dialog.client_cert.text(),
+                        ssl_key=dialog.ssl_key.text()
+                    )
+                    conn = con_props.connect()
+                    if conn is not None:
+                        self.db_con_props = con_props
+                        settings.setValue('host', dialog.host.text())
+                        settings.setValue('port', dialog.port.text())
+                        settings.setValue('database', dialog.database.text())
+                        settings.setValue('user', dialog.user.text())
+                        # settings.setValue('password', dialog.password.text())
+                        settings.setValue('root_cert', dialog.root_cert.text())
+                        settings.setValue('client_cert', dialog.client_cert.text())
+                        settings.setValue('ssl_key', dialog.ssl_key.text())
+                    else:
+                        raise Exception('Failed to connect to database')
+                except Exception as e:
+                    QMessageBox.critical(self, 'Connection Error', str(e))
 
     def tile_windows_horizontally(self):
 
@@ -99,7 +142,11 @@ class MainWindow(QMainWindow):
         self.backup_required = True
 
     def open_visits(self):
-        self.open_subwindow(ProjectsView(self.db_path), 'Visits')
+        if self.db_con_props is None:
+            self.login()
+            if self.db_con_props is None:
+                return
+        self.open_subwindow(ProjectsView(self.db_con_props), 'Visits')
 
     def open_subwindow(self, widget, title):
         subwindow = QMdiSubWindow()
@@ -136,10 +183,6 @@ class MainWindow(QMainWindow):
 
 
 app = QApplication(sys.argv)
-
-env_access_token = os.getenv('HARVEST_ACCESS_TOKEN')
-env_account_id = os.getenv('HARVEST_ACCOUNT_ID')
-
-window = MainWindow(env_access_token, env_account_id)
+window = MainWindow()
 window.show()
 app.exec()

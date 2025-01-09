@@ -3,11 +3,13 @@ from datetime import datetime
 from PyQt6.QtCore import Qt, QAbstractTableModel, QModelIndex
 from PyQt6.QtGui import QColor
 from classes.Project import Project
+from classes.DBConProps import DBConProps
 
 
 class ProjectsModel(QAbstractTableModel):
-    def __init__(self):
+    def __init__(self, db_con_props: DBConProps):
         super().__init__()
+        self.db_con_props = db_con_props
         self._data: List[Project] = []
         self._header = ['ProjectID', 'Watershed', 'Site',  'Year', 'VisitID', 'Project Type', 'GUID']
 
@@ -40,7 +42,7 @@ class ProjectsModel(QAbstractTableModel):
     def load_data(self, watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str,) -> int:
 
         self.beginResetModel()
-        self._data = Project.load(watershed_ids, visit_years, statuses, project_type_ids, search)
+        self._data = Project.load(self.db_con_props, watershed_ids, visit_years, statuses, project_type_ids, search)
         self.endResetModel()
         return len(self._data)
 
