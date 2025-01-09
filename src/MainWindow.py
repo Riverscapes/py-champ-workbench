@@ -1,8 +1,8 @@
 import os
 import sys
 from dotenv import load_dotenv
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QMessageBox, QDialog
-from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QFileDialog, QMessageBox, QDialog
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QSettings, Qt
 from views.ProjectsView import ProjectsView
 from dialogs.LoginDialog import LoginDialog
@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
         window_menu.addAction(window_vertical)
 
         self.setWindowTitle('CHaMP Workbench')
+        self.setWindowIcon(QIcon('favicon.ico'))
         self.resize(800, 1000)
 
         self.open_visits()
