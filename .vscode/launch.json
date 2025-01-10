@@ -15,7 +15,7 @@
             "name": "Load Asotin Data",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/import_asotin_projects.py",
+            "program": "${workspaceFolder}/python-scripts/import_asotin_projects.py",
             "console": "integratedTerminal",
         },
         {

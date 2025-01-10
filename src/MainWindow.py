@@ -1,18 +1,16 @@
 import os
 import sys
 from dotenv import load_dotenv
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QFileDialog, QMessageBox, QDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QMessageBox, QDialog
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QSettings, Qt
 from views.ProjectsView import ProjectsView
 from dialogs.LoginDialog import LoginDialog
 from classes.DBConProps import DBConProps
+from __version__ import __version__
 
 COMPANY_NAME = 'NorthArrowResearch'
 APP_NAME = 'ChAMPWorkbench'
-
-# Load variables from .env file
-load_dotenv()
 
 
 class MainWindow(QMainWindow):
@@ -51,7 +49,7 @@ class MainWindow(QMainWindow):
         window_vertical.triggered.connect(self.tile_windows_vertically)
         window_menu.addAction(window_vertical)
 
-        self.setWindowTitle('CHaMP Workbench')
+        self.setWindowTitle(f'CHaMP Workbench ({__version__})')
         self.setWindowIcon(QIcon('favicon.ico'))
         self.resize(800, 1000)
 

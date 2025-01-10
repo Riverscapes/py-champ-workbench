@@ -30,8 +30,8 @@ class Project():
 
         search_filter = ''
         if search != '':
-            search_filter = ' AND (%s IS NULL OR LOWER(site_name) LIKE LOWER(%s) OR visit_id::text = %s)'
-            params.extend([None, f'%{search}%', search])
+            search_filter = ' AND (LOWER(site_name) LIKE LOWER(%s) OR visit_id::text = %s)'
+            params.extend([f'{search}%', search])
 
         query = f'''
             SELECT *

@@ -57,6 +57,14 @@ class CheckedListBox(QWidget):
         # print(f"{item.text()} is checked" if item.checkState() == Qt.CheckState.Checked else f"{item.text()} is unchecked")
         self.on_check_changed.emit()
 
+    def check_items_with_ids(self, ids: List[int]):
+        """Check items with the given IDs."""
+
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if self.master_items[item.text()] in ids:
+                item.setCheckState(Qt.CheckState.Checked)
+
     # def show_context_menu(self, position: QPoint):
     #     # Get the index of the item that was clicked
     #     index = self.table.indexAt(position)

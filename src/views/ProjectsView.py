@@ -18,7 +18,7 @@ class ProjectsView(QWidget):
         super().__init__()
 
         main_hlayout = QHBoxLayout()
-        menu_bar = QMenuBar(self)
+        # menu_bar = QMenuBar(self)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
         main_hlayout.addWidget(splitter)
@@ -31,6 +31,7 @@ class ProjectsView(QWidget):
         self.search = QLineEdit()
         self.search.setFixedWidth(200)
         self.search.setPlaceholderText("Visit ID or Site Name")
+        self.search.textChanged.connect(self.load_data)
         left_layout.addWidget(self.search)
 
         watersheds = Watershed.load()
@@ -47,6 +48,7 @@ class ProjectsView(QWidget):
         statuses.sort(key=lambda x: x.name)
         self.statuses = CheckedListBox([(s.status_id, s.name) for s in statuses])
         self.statuses.on_check_changed.connect(self.load_data)
+        self.statuses.check_items_with_ids([1, 2, 3, 5, 6])
         left_layout.addWidget(self.statuses)
 
         project_types = ProjectType.load()
