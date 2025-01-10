@@ -1,1 +1,1 @@
-.venv\Scripts\pyinstaller MainWindow.spec
+.venv\Scripts\pyinstaller --onefile --name=ChaMPWorkbench --windowed src\MainWindow.py
