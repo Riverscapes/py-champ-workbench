@@ -1,8 +1,9 @@
 import webbrowser
 from PyQt6.QtWidgets import QDialog, QLabel, QVBoxLayout, QFormLayout, QLineEdit, QTextEdit, QMessageBox, QHBoxLayout, QPushButton
-from classes.Project import Project
 from widgets.DBCombo import DBCombo
 from dialogs.dialog_utilities import dialog_buttons
+from classes.Project import Project
+from classes.DBConProps import DBConProps
 
 TIME_DELTA_WARNING = 30
 
@@ -12,12 +13,13 @@ BASEL_URL = 'https://data.riverscapes.net'
 
 
 class ProjectDialog(QDialog):
-    def __init__(self, project_id: int, parent=None):
+    def __init__(self, db_con_props: DBConProps, project_id: int, parent=None):
         super().__init__(parent)
 
+        self.db_con_props = db_con_props
         self.setWindowTitle(f'Project Details ({project_id})')
 
-        self.project: Project = Project.load_project_by_id(project_id)
+        self.project: Project = Project.load_project_by_id(db_con_props, project_id)
 
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
@@ -76,7 +78,7 @@ class ProjectDialog(QDialog):
 
         if description != self.project.description or self.project.guid != guid or status_id != self.project.status_id:
             try:
-                Project.save(self.project.project_id, status_id, guid, description)
+                Project.save(self.db_con_props, self.project.project_id, status_id, guid, description)
             except Exception as e:
                 QMessageBox().critical(self, 'Error', f'Error saving project: {e}')
 

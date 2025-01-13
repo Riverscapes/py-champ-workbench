@@ -1,5 +1,6 @@
 import webbrowser
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QLineEdit, QSplitter, QLabel
+from PyQt6.QtGui import QAction
 from PyQt6.QtCore import Qt, QPoint, pyqtSignal
 from models.ProjectsModel import ProjectsModel
 from widgets.CheckedListBox import CheckedListBox
@@ -8,6 +9,7 @@ from classes.ProjectType import ProjectType
 from classes.Status import Status
 from classes.DBConProps import DBConProps
 from dialogs.ProjectDialog import ProjectDialog
+from dialogs.AssignStatusDialog import AssignStatusDialog
 
 
 class ProjectsView(QWidget):
@@ -66,8 +68,10 @@ class ProjectsView(QWidget):
         self.table = QTableView()
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QTableView.SelectionMode.SingleSelection)
+        self.table.setSelectionMode(QTableView.SelectionMode.MultiSelection)
         self.table.verticalHeader().setVisible(False)
+        self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self.show_context_menu)
         self.table.doubleClicked.connect(self.handle_double_click)
 
         self.model = ProjectsModel(db_con_props)
@@ -120,8 +124,40 @@ class ProjectsView(QWidget):
                 url = f'https://data.riverscapes.net/p/{guid}'
                 webbrowser.open(url)
         else:
-            dialog = ProjectDialog(item_id)
+            dialog = ProjectDialog(self.model.db_con_props, item_id)
             result = dialog.exec()
             if result == QDialog.DialogCode.Accepted:
                 self.load_data(item_id)
                 self.on_data_changed.emit()
+
+    def show_context_menu(self, position: QPoint):
+        # Get the index of the item that was clicked
+        index = self.table.indexAt(position)
+
+        if not index.isValid():
+            return
+
+        # Get the row number
+        row = index.row()
+
+        # Create the context menu
+        context_menu = QMenu(self)
+
+        # Add actions to the context menu
+        action_assign_status = QAction('Assign Status', self)
+
+        # Add actions to the menu
+        context_menu.addAction(action_assign_status)
+        # Connect the actions to slots (you can define what should happen)
+        action_assign_status.triggered.connect(lambda: self.assign_statis())
+
+        # Show the context menu at the cursor position
+        context_menu.exec(self.table.viewport().mapToGlobal(position))
+
+    def assign_statis(self):
+
+        selected_rows = self.table.selectionModel().selectedRows()
+        project_ids = [self.model.data(self.model.index(row.row(), 0)) for row in selected_rows]
+        dialog = AssignStatusDialog(self.model.db_con_props, project_ids)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_data()
