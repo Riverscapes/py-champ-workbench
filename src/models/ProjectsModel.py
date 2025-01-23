@@ -11,6 +11,7 @@ class ProjectsModel(QAbstractTableModel):
         self.db_con_props = db_con_props
         self._data: List[Project] = []
         self._header = ['ProjectID', 'Watershed', 'Site',  'Year', 'VisitID', 'Project Type', 'GUID']
+        self.with_guid = 0
 
     def data(self, index, role: int = Qt.ItemDataRole.DisplayRole):
 
@@ -41,7 +42,9 @@ class ProjectsModel(QAbstractTableModel):
     def load_data(self, watershed_ids: List[int], visit_years: List[int], statuses: List[int], project_type_ids: List[int], search: str,) -> int:
 
         self.beginResetModel()
+        self.with_guid = 0
         self._data = Project.load(self.db_con_props, watershed_ids, visit_years, statuses, project_type_ids, search)
+        self.with_guid = sum([1 for project in self._data if project.guid is not None])
         self.endResetModel()
         return len(self._data)
 

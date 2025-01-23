@@ -103,7 +103,7 @@ class ProjectsView(QWidget):
         search = self.search.text()
 
         total = self.model.load_data(watershed_ids, visit_years, statuses, project_type_ids, search)
-        self.lbl_status.setText(f"Projects shown: {total:,}")
+        self.lbl_status.setText(f"Projects shown: {total:,}\nProjects with GUIDs: {self.model.with_guid:,} ({self.model.with_guid / total:.0%})")
         # self.on_data_changed.emit()
         self.table.resizeColumnsToContents()
 
