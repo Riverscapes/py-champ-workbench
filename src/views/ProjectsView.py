@@ -146,9 +146,12 @@ class ProjectsView(QWidget):
 
         # Add actions to the context menu
         action_assign_status = QAction('Assign Status', self)
+        clear_selection = QAction('Clear Selection', self)
+        clear_selection.triggered.connect(lambda: self.table.clearSelection())
 
         # Add actions to the menu
         context_menu.addAction(action_assign_status)
+        context_menu.addAction(clear_selection)
         # Connect the actions to slots (you can define what should happen)
         action_assign_status.triggered.connect(lambda: self.assign_statis())
 
