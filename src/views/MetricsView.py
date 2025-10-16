@@ -15,7 +15,6 @@ class MetricsView(QWidget):
         super().__init__()
 
         main_hlayout = QHBoxLayout()
-        # menu_bar = QMenuBar(self)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
         main_hlayout.addWidget(splitter)
