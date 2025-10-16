@@ -1,17 +1,10 @@
-import webbrowser
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableView, QHeaderView, QMenuBar, QMenu, QMessageBox, QDialog, QLineEdit, QSplitter, QLabel, QComboBox
-from PyQt6.QtGui import QAction
-from PyQt6.QtCore import Qt, QPoint, pyqtSignal
-from models.ProjectsModel import ProjectsModel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QLabel, QComboBox
+from PyQt6.QtCore import Qt, pyqtSignal
+from matplotlib.ticker import AutoMinorLocator, StrMethodFormatter
 from widgets.CheckedListBox import CheckedListBox
 from classes import Watershed, MetricPlot, db_connect, MetricDefinition
-from classes.ProjectType import ProjectType
-from classes.Status import Status
 from classes.DBConProps import DBConProps
-from dialogs.ProjectDialog import ProjectDialog
-from dialogs.AssignStatusDialog import AssignStatusDialog
 from classes.MatPlotLibChart import MplCanvas
-from matplotlib.ticker import AutoMinorLocator, StrMethodFormatter
 
 
 class MetricsView(QWidget):
@@ -31,12 +24,6 @@ class MetricsView(QWidget):
         left_layout = QVBoxLayout(left_widget)
         splitter.addWidget(left_widget)
         splitter.setStretchFactor(0, 0)  # Fixed width for the left pane
-
-        self.search = QLineEdit()
-        self.search.setFixedWidth(200)
-        self.search.setPlaceholderText("Visit ID or Site Name")
-        self.search.textChanged.connect(self.load_data)
-        left_layout.addWidget(self.search)
 
         watersheds = Watershed.load()
         watersheds.sort(key=lambda x: x.watershed_name)
@@ -124,7 +111,7 @@ class MetricsView(QWidget):
 
         # Store visit IDs for tooltip display
         self.visit_ids = [row['visit_id'] for row in rows if row['x_value'] is not None and row['y_value'] is not None]
-        self.annot = self.sc.ax.annotate("", xy=(0,0), xytext=(10,10), textcoords="offset points",
+        self.annot = self.sc.ax.annotate("", xy=(0, 0), xytext=(10, 10), textcoords="offset points",
                                          bbox=dict(boxstyle="round", fc="white", ec="black", lw=0.5),
                                          arrowprops=dict(arrowstyle="->"))
         self.annot.set_visible(False)
