@@ -19,6 +19,16 @@
             "console": "integratedTerminal",
         },
         {
+            "name": "Test Metric Import",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/test_metric_import.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/Users/philipbailey/GISData/riverscapes/champ/metrics/0687/CHaMP_Metrics_Visit_687.xml"
+            ]
+        },
+        {
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",

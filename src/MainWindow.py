@@ -1,12 +1,15 @@
 import os
 import sys
+from typing import List
+import xml.etree.ElementTree as ET
+import xml.dom.minidom
 from dotenv import load_dotenv
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QMessageBox, QDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QMessageBox, QDialog, QFileDialog
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QSettings, Qt
-from views.ProjectsView import ProjectsView
+from views import ProjectsView, MetricsView
 from dialogs.LoginDialog import LoginDialog
-from classes.DBConProps import DBConProps
+from classes import MetricDefinition, db_connect, DBConProps
 from __version__ import __version__
 
 COMPANY_NAME = 'NorthArrowResearch'
@@ -36,7 +39,13 @@ class MainWindow(QMainWindow):
         # Items that don't vary by database simply have 'None' as their data
         self.views_menu = menu_bar.addMenu('Views')
         self.add_main_view("Visits", None, self.open_visits, None)
-        self.views_menu.addSeparator()
+        self.add_main_view('Metrics', None, self.open_metrics, None)
+        # self.views_menu.addSeparator()
+
+        self.tools_menu = menu_bar.addMenu('Tools')
+        action = QAction('Import Metrics', self)
+        action.triggered.connect(self.import_metrics)
+        self.tools_menu.addAction(action)
 
         #####################################################################################################################
         # Window menu
@@ -143,6 +152,13 @@ class MainWindow(QMainWindow):
                 return
         self.open_subwindow(ProjectsView(self.db_con_props), 'Visits')
 
+    def open_metrics(self):
+        if self.db_con_props is None:
+            self.login()
+            if self.db_con_props is None:
+                return
+        self.open_subwindow(MetricsView(self.db_con_props), 'Metrics')
+
     def open_subwindow(self, widget, title):
         subwindow = QMdiSubWindow()
         subwindow.setWidget(widget)
@@ -175,6 +191,52 @@ class MainWindow(QMainWindow):
             action.setShortcut(f'Ctrl+{shortcut}')
 
         self.views_menu.addAction(action)
+
+    def import_metrics(self):
+
+        # Open filebrowse dialog to select folder
+        folder = QFileDialog.getExistingDirectory(self, 'Select Parent Folder Containing Metrics XML Files')
+        if not folder:
+            return
+
+       # Find all metrics files in the specified directory, recursively
+        metrics_files = []
+        for root, _dirs, files in os.walk(folder):
+            for file in files:
+                if file.endswith('.xml'):
+                    metrics_files.append(os.path.join(root, file))
+
+        # Tell user how many files were found and ask to proceed
+        if not metrics_files:
+            QMessageBox.information(self, 'Import Metrics', 'No metrics files found.')
+            return
+
+        reply = QMessageBox.question(self, 'Import Metrics', f'Found {len(metrics_files)} metrics files in {folder}. Do you want to proceed?')
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        metric_definitions: List[MetricDefinition] = MetricDefinition.load(15, True)
+
+        conn = db_connect()
+        curs = conn.cursor()
+        errors = []
+        success_count = 0
+
+        for metrics_file in metrics_files:
+
+            try:
+                MetricDefinition.import_from_xml(curs, metric_definitions, metrics_file)
+                success_count += 1
+
+            except Exception as e:
+                conn.rollback()
+                errors.append(f'Error processing {metrics_file}: {str(e)}')
+                continue
+
+        if len(errors) > 0:
+            QMessageBox.critical(self, 'Import Metrics', f'Errors occurred:\n' + '\n'.join(errors))
+        else:
+            QMessageBox.information(self, 'Import Metrics', f'Successfully imported metrics from {success_count} out of {len(metrics_files)} files.')
 
 
 app = QApplication(sys.argv)
