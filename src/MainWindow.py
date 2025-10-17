@@ -1,13 +1,11 @@
 import os
 import sys
 from typing import List
-import xml.etree.ElementTree as ET
-import xml.dom.minidom
 from dotenv import load_dotenv
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMdiArea, QMdiSubWindow, QMessageBox, QDialog, QFileDialog
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QSettings, Qt
-from views import ProjectsView, MetricsView
+from views import ProjectsView, MetricsView, StatusView
 from dialogs.LoginDialog import LoginDialog
 from classes import MetricDefinition, db_connect, DBConProps
 from __version__ import __version__
@@ -40,6 +38,7 @@ class MainWindow(QMainWindow):
         self.views_menu = menu_bar.addMenu('Views')
         self.add_main_view("Visits", None, self.open_visits, None)
         self.add_main_view('Metrics', None, self.open_metrics, None)
+        self.add_main_view('Status', None, self.open_status, None)
         # self.views_menu.addSeparator()
 
         self.tools_menu = menu_bar.addMenu('Tools')
@@ -159,6 +158,13 @@ class MainWindow(QMainWindow):
                 return
         self.open_subwindow(MetricsView(self.db_con_props), 'Metrics')
 
+    def open_status(self):
+        if self.db_con_props is None:
+            self.login()
+            if self.db_con_props is None:
+                return
+        self.open_subwindow(StatusView(self.db_con_props), 'Topo Project Status')
+
     def open_subwindow(self, widget, title):
         subwindow = QMdiSubWindow()
         subwindow.setWidget(widget)
@@ -234,7 +240,7 @@ class MainWindow(QMainWindow):
                 continue
 
         if len(errors) > 0:
-            QMessageBox.critical(self, 'Import Metrics', f'Errors occurred:\n' + '\n'.join(errors))
+            QMessageBox.critical(self, 'Import Metrics', 'Errors occurred:\n' + '\n'.join(errors))
         else:
             QMessageBox.information(self, 'Import Metrics', f'Successfully imported metrics from {success_count} out of {len(metrics_files)} files.')
 
