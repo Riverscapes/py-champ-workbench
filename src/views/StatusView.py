@@ -13,15 +13,45 @@ QUERIES = {
             v.watershed_name,
             v.visit_year,
             COUNT(*) AS total_count,
-            COUNT(CASE WHEN p.guid IS NOT NULL THEN 1 END) AS with_guid
+            COUNT(CASE WHEN p.guid IS NOT NULL THEN 1 END) AS with_data
         FROM vw_visits v
         INNER JOIN projects p ON v.visit_id = p.visit_id
         INNER JOIN watersheds w ON v.watershed_id = w.watershed_id
         WHERE w.is_champ <> 0 and p.project_type_id = 1
         GROUP BY v.watershed_id, v.watershed_name, v.visit_year
         ORDER BY v.watershed_name, v.visit_year;
-        """
+    """,
+    "aux_status": """
+        SELECT 
+            v.watershed_id,
+            v.watershed_name,
+            v.visit_year,
+            COUNT(*) as total_count,
+            COUNT(CASE WHEN v.aux_uploaded IS NOT NULL THEN 1 END) AS with_data
+        FROM vw_visits v
+        INNER JOIN projects p ON v.visit_id = p.visit_id
+        INNER JOIN watersheds w ON v.watershed_id = w.watershed_id
+        WHERE w.is_champ <> 0 and p.project_type_id = 1
+        GROUP BY v.watershed_id, v.watershed_name, v.visit_year
+        ORDER BY v.watershed_name, v.visit_year;
+    """,
+    "metric_status": """
+       SELECT v.watershed_id,
+       v.watershed_name,
+       v.visit_year,
+         COUNT(*) AS total_count,   
+       MAX(CASE WHEN vm.visit_id is NULL THEN 0 ELSE 1 END) with_data
+FROM vw_visits v
+         INNER JOIN projects p ON v.visit_id = p.visit_id
+         INNER JOIN watersheds w ON v.watershed_id = w.watershed_id
+         left join (SELECT distinct visit_id FROM visit_metrics) vm on v.visit_id = vm.visit_id
+WHERE w.is_champ <> 0
+  and p.project_type_id = 1
+GROUP BY v.watershed_id, v.watershed_name, v.visit_year
+ORDER BY v.watershed_name, v.visit_year;
+    """
 }
+
 
 class StatusView(QWidget):
 
@@ -48,8 +78,8 @@ class StatusView(QWidget):
         # Convert to nested dict: {watershed_name: {year: (with_guid, without_guid)}}
         grouped = {}
         for row in data:
-            without_guid = row['total_count'] - row['with_guid']
-            grouped.setdefault(row['watershed_name'], {})[row['visit_year']] = (row['with_guid'], without_guid)
+            without_data = row['total_count'] - row['with_data']
+            grouped.setdefault(row['watershed_name'], {})[row['visit_year']] = (row['with_data'], without_data)
 
         # Clear previous plot
         self.sc.ax.clear()
@@ -99,7 +129,7 @@ class StatusView(QWidget):
             # ax.text(0.5, 1.05, f"{pct:.1f}% with GUID", transform=ax.transAxes,
             #         ha='center', va='bottom', fontsize=10, fontweight='bold')
 
-            ax.set_title(f"{name} {pct:.1f}% with Topo Project")
+            ax.set_title(f"{name} {pct:.1f}%")
 
         # Plot totals across all watersheds
         ax = fig.add_subplot(nrows, ncols, num_ws)

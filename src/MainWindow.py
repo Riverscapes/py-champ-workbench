@@ -40,8 +40,8 @@ class MainWindow(QMainWindow):
         self.add_main_view('Metrics', None, self.open_metrics, None)
         self.views_menu.addSeparator()
         self.add_main_view('Topo Status', None, self.open_topo_status, None)
-        self.add_main_view('Aux Status', None, self.open_topo_status, None)
-        self.add_main_view('Metrics Status', None, self.open_topo_status, None)
+        self.add_main_view('Aux Status', None, self.open_aux_status, None)
+        self.add_main_view('Metrics Status', None, self.open_metrics_status, None)
         # self.views_menu.addSeparator()
 
         self.tools_menu = menu_bar.addMenu('Tools')
