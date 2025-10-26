@@ -38,7 +38,10 @@ class MainWindow(QMainWindow):
         self.views_menu = menu_bar.addMenu('Views')
         self.add_main_view("Visits", None, self.open_visits, None)
         self.add_main_view('Metrics', None, self.open_metrics, None)
-        self.add_main_view('Status', None, self.open_status, None)
+        self.views_menu.addSeparator()
+        self.add_main_view('Topo Status', None, self.open_topo_status, None)
+        self.add_main_view('Aux Status', None, self.open_topo_status, None)
+        self.add_main_view('Metrics Status', None, self.open_topo_status, None)
         # self.views_menu.addSeparator()
 
         self.tools_menu = menu_bar.addMenu('Tools')
@@ -158,12 +161,26 @@ class MainWindow(QMainWindow):
                 return
         self.open_subwindow(MetricsView(self.db_con_props), 'Metrics')
 
-    def open_status(self):
+    def open_topo_status(self):
         if self.db_con_props is None:
             self.login()
             if self.db_con_props is None:
                 return
-        self.open_subwindow(StatusView(self.db_con_props), 'Topo Project Status')
+        self.open_subwindow(StatusView('topo_status', self), 'Topo Project Status')
+
+    def open_aux_status(self):
+        if self.db_con_props is None:
+            self.login()
+            if self.db_con_props is None:
+                return
+        self.open_subwindow(StatusView('aux_status', self), 'Aux Project Status')
+
+    def open_metrics_status(self):
+        if self.db_con_props is None:
+            self.login()
+            if self.db_con_props is None:
+                return
+        self.open_subwindow(StatusView('metric_status', self), 'Metrics Project Status')
 
     def open_subwindow(self, widget, title):
         subwindow = QMdiSubWindow()

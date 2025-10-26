@@ -1,36 +1,13 @@
-import numpy as np
 import math
 from collections import defaultdict
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QLabel, QComboBox
-from PyQt6.QtCore import Qt, pyqtSignal
-from matplotlib.ticker import AutoMinorLocator, StrMethodFormatter
-from widgets.CheckedListBox import CheckedListBox
-from classes import Watershed, MetricPlot, db_connect, MetricDefinition
-from classes.DBConProps import DBConProps
+import numpy as np
+from PyQt6.QtWidgets import QWidget, QHBoxLayout
+from PyQt6.QtCore import pyqtSignal
+from classes import db_connect
 from classes.MatPlotLibChart import MplCanvas
 
-
-class StatusView(QWidget):
-
-    on_data_changed = pyqtSignal()
-
-    def __init__(self, db_con_props: DBConProps):
-        super().__init__()
-
-        main_hlayout = QHBoxLayout()
-
-        self.sc = MplCanvas(self)  # , width=5, height=4, dpi=100)
-        main_hlayout.addWidget(self.sc)
-        self.setLayout(main_hlayout)
-
-        self.load_data()
-
-    def load_data(self) -> None:
-
-        dbcon = db_connect()
-        curs = dbcon.cursor()
-
-        query = """
+QUERIES = {
+    "topo_status": """
         SELECT 
             v.watershed_id,
             v.watershed_name,
@@ -44,8 +21,29 @@ class StatusView(QWidget):
         GROUP BY v.watershed_id, v.watershed_name, v.visit_year
         ORDER BY v.watershed_name, v.visit_year;
         """
+}
 
-        data = curs.execute(query).fetchall()
+class StatusView(QWidget):
+
+    on_data_changed = pyqtSignal()
+
+    def __init__(self, sql_key: str, parent: QWidget) -> None:
+        super().__init__(parent)
+
+        main_hlayout = QHBoxLayout()
+        self.sql_query = QUERIES[sql_key]
+
+        self.sc = MplCanvas(self)  # , width=5, height=4, dpi=100)
+        main_hlayout.addWidget(self.sc)
+        self.setLayout(main_hlayout)
+
+        self.load_data()
+
+    def load_data(self) -> None:
+
+        dbcon = db_connect()
+        curs = dbcon.cursor()
+        data = curs.execute(self.sql_query).fetchall()
 
         # Convert to nested dict: {watershed_name: {year: (with_guid, without_guid)}}
         grouped = {}
