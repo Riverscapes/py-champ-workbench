@@ -3,6 +3,7 @@ from collections import defaultdict
 import numpy as np
 from PyQt6.QtWidgets import QWidget, QHBoxLayout
 from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtGui import QKeySequence, QShortcut
 from classes import db_connect
 from classes.MatPlotLibChart import MplCanvas
 
@@ -67,6 +68,10 @@ class StatusView(QWidget):
         main_hlayout.addWidget(self.sc)
         self.setLayout(main_hlayout)
 
+        # Add a keyboard shortcut to refresh data
+        self.refresh_shortcut = QShortcut(QKeySequence("F5"), self)
+        self.refresh_shortcut.activated.connect(self.load_data)
+
         self.load_data()
 
     def load_data(self) -> None:
@@ -129,7 +134,8 @@ class StatusView(QWidget):
             # ax.text(0.5, 1.05, f"{pct:.1f}% with GUID", transform=ax.transAxes,
             #         ha='center', va='bottom', fontsize=10, fontweight='bold')
 
-            ax.set_title(f"{name} {pct:.1f}%")
+            # Include totals across years: with data / total expected and percentage
+            ax.set_title(f"{name} {total_with_guid}/{total_records} ({pct:.1f}%)")
 
         # Plot totals across all watersheds
         ax = fig.add_subplot(nrows, ncols, num_ws)
@@ -156,7 +162,8 @@ class StatusView(QWidget):
         # ax.text(0.5, 1.05, f"{pct:.1f}% with GUID", transform=ax.transAxes,
         #         ha='center', va='bottom', fontsize=10, fontweight='bold')
 
-        ax.set_title(f"All Watersheds {pct:.1f}% with Topo Project")
+        # Title: total with data / total expected and percentage for all watersheds
+        ax.set_title(f"All Watersheds {total_with_guid}/{total_records} ({pct:.1f}%) with Topo Project")
 
         # Hide any remaining empty subplots
         total_subplots = nrows * ncols
