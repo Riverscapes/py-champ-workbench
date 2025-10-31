@@ -117,7 +117,7 @@ class StatusView(QWidget):
 
             ax.legend_.remove() if ax.get_legend() else None
             ax.yaxis.grid(True, color="#EEEEEE")
-            ax.set_ylim(0, max_count * 1.1)
+            # ax.set_ylim(0, max_count * 1.1)
             ax.set_xticks(x)
             ax.set_xticklabels(years, rotation=45)
             ax.set_ylabel("Count")
@@ -144,7 +144,7 @@ class StatusView(QWidget):
 
         ax.legend_.remove() if ax.get_legend() else None
         ax.yaxis.grid(True, color="#EEEEEE")
-        ax.set_ylim(0, max_count * 1.1)
+        # ax.set_ylim(0, max_count * 1.1)
         ax.set_xticks(x)
         ax.set_xticklabels(years, rotation=45)
         ax.set_ylabel("Count")
