@@ -19,6 +19,17 @@
             "console": "integratedTerminal",
         },
         {
+            "name": "Convert All Measurements to SQLite",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/python-scripts/export_all_measurements.py",
+            "console": "integratedTerminal",
+            "args": [
+                "/Users/philipbailey/GISData/riverscapes/champ/CHaMP_All Measurements.MDB",
+                "/Users/philipbailey/GISData/riverscapes/champ/CHaMP_All Measurements.sqlite"
+            ]
+        },
+        {
             "name": "Test Metric Import",
             "type": "debugpy",
             "request": "launch",
