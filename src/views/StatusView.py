@@ -18,7 +18,10 @@ QUERIES = {
         FROM vw_visits v
         INNER JOIN projects p ON v.visit_id = p.visit_id
         INNER JOIN watersheds w ON v.watershed_id = w.watershed_id
-        WHERE w.is_champ <> 0 and p.project_type_id = 1
+        WHERE (w.is_champ <> 0)
+            AND (p.project_type_id = 1)
+            AND (p.status_id <> 4) -- Exclide "Will Not Process"
+            AND (p.status_id <> 6) -- Exclude "Not Collected - Invalid"
         GROUP BY v.watershed_id, v.watershed_name, v.visit_year
         ORDER BY v.watershed_name, v.visit_year;
     """,
@@ -32,7 +35,10 @@ QUERIES = {
         FROM vw_visits v
         INNER JOIN projects p ON v.visit_id = p.visit_id
         INNER JOIN watersheds w ON v.watershed_id = w.watershed_id
-        WHERE w.is_champ <> 0 and p.project_type_id = 1
+        WHERE (w.is_champ <> 0)
+            AND (p.project_type_id = 1)
+            AND (p.status_id <> 4) -- Exclide "Will Not Process"
+            AND (p.status_id <> 6) -- Exclude "Not Collected - Invalid"
         GROUP BY v.watershed_id, v.watershed_name, v.visit_year
         ORDER BY v.watershed_name, v.visit_year;
     """,
