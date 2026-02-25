@@ -123,7 +123,15 @@ class StatusView(QWidget):
             without_guid_vals = [years_data[y][1] for y in years]
             x = np.arange(len(years))
 
-            ax.bar(x, with_guid_vals, color="#4CAF50")
+            # Determine colors based on completion status (100% complete => Dark Green)
+            bar_colors = []
+            for w, wo in zip(with_guid_vals, without_guid_vals):
+                if wo == 0 and w > 0:  # 100% complete
+                    bar_colors.append("#006400")  # Dark Green
+                else:
+                    bar_colors.append("#4CAF50")  # Light Green
+
+            ax.bar(x, with_guid_vals, color=bar_colors)
             ax.bar(x, without_guid_vals, bottom=with_guid_vals, color="#D3D3D3")
 
             ax.legend_.remove() if ax.get_legend() else None
@@ -151,7 +159,15 @@ class StatusView(QWidget):
         x = np.arange(len(years))
         max_count = max(with_guid + without_guid for with_guid, without_guid in zip(with_guid_vals, without_guid_vals))
 
-        ax.bar(x, with_guid_vals, color="#4CAF50")
+        # Determine colors for totals
+        bar_colors = []
+        for w, wo in zip(with_guid_vals, without_guid_vals):
+            if wo == 0 and w > 0:  # 100% complete
+                bar_colors.append("#006400")  # Dark Green
+            else:
+                bar_colors.append("#4CAF50")  # Light Green
+
+        ax.bar(x, with_guid_vals, color=bar_colors)
         ax.bar(x, without_guid_vals, bottom=with_guid_vals, color="#D3D3D3")
 
         ax.legend_.remove() if ax.get_legend() else None

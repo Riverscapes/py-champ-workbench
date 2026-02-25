@@ -42,7 +42,7 @@ class ProjectsView(QWidget):
         self.chk_watersheds.on_check_changed.connect(self.load_data)
         left_layout.addWidget(self.chk_watersheds)
 
-        self.chk_years = CheckedListBox([(y, str(y)) for y in range(2011, 2020)])
+        self.chk_years = CheckedListBox([(y, str(y)) for y in range(2011, 2021)])
         self.chk_years.on_check_changed.connect(self.load_data)
         left_layout.addWidget(self.chk_years)
 
