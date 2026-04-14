@@ -60,3 +60,7 @@ SSLROOTCERT=XXXXXXXXXXXXX
 SSLCLIENTCERT=XXXXXXXXXXXXX
 SSLKEY=XXXXXXXXXXXXX
 ```
+
+# Google Postgres Database Backup
+
+On 14 Apr 2026, the Google Postgres database was backed up and turned off. The script at /scripts/db_postgres_dump.py was used to backup the postgres to a local SQLite database before it was taken offline. The SQlite file was stored locally on Philip and Kellys computers as well as in S3 data folder.
